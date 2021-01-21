@@ -1,0 +1,18 @@
+PreServer is a 3rd person platformer where you play as a digital squirrel in a simulator.
+Two abilities the squirrel has are climbing, on specific surfaces, and dashing.
+ - Climbing: The player is able to climb freely on certain tagged surfaces and transfer between climbs
+	if the angle between normals is too big to look smooth with player control.
+ - Lag Dash: The player is able to press a button to lag dash, holding the button slows down time and 
+	allows players to visualize where they will end up on the dash. In this state, players are also able
+	to adjust their rotation to a certain degree. The slow down is temporary, as time will slowly 
+	return to normal.
+The video attached shows off both abilities
+Gizmos are left on to visualize the following:
+ - Lag Dash:
+	- Black Lines: The calculated path
+	- Yellow Lines: Where the ground changed
+	- Red Lines: The incremented under check
+ - Climbing: (Player cannot go past the first two lines when climbing, past that is unsafe)
+	- Pink under the player: Target rotation
+	- Cyan Line: Target velocity
+	- Pink at player origin: Velocity player moves when rotating on unsafe edges

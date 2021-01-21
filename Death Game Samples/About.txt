@@ -1,0 +1,7 @@
+Death Game (Untitled at the moment) is a horror game that pays homage to classic horror games on the PS1
+There is a hand enemy in the game that comes from the ground and will snatch the player if they are in range.
+The green wire sphere triggers the hand, the red one triggers the attack, and the yellow one is the grab hitbox.
+If grabbed you must mash the controller buttons to escape.
+
+The Hands script inherits from the Enemy script which contains patrol states and attack states.
+Hand movement is controlled by the animation.

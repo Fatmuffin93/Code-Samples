@@ -1,0 +1,6 @@
+Descrambler is a mobile word puzzle game. If the player is taking too long to find a word, a hint
+will be generated for them.
+The Hint script iterates through every tile on the board and recursively checks adjacent tiles
+to construct a word. That word is then cross-referenced in the game's dictionary which is a
+dictionary<int, List<string>>, the key being the string hash and the list being the words that
+share that hash.
