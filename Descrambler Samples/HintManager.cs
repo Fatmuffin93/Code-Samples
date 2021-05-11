@@ -3,12 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Text;
 
-//TODO: Need to make this much faster it is too slow right now
-//Have no other idea on how to do this but this will be called
-//after every swap and every solve
-//Could also make it so the it happens only on the hint delay so faster players will rarely see it
-//Could limit the num of words found but will try my best to avoid
-//For now i am only making it find 10 words
 public class HintManager : MonoBehaviour
 {
     public Tile[] hint;
@@ -17,12 +11,14 @@ public class HintManager : MonoBehaviour
     public float endDelay;
     private float endDelaySeconds;
     List<Tile[]> hints;
-    public bool debugFindHints;
     List<ParticleSystem> currentMarkers;
     bool finished = false;
     public Text hintText;
     Object HintParticle;
     StringBuilder stringBuilder;
+    public bool debugFindHints;
+    public bool debugUseBuckets;
+    public bool alwaysRemove;
     // Start is called before the first frame update
     void Start()
     {
@@ -72,6 +68,8 @@ public class HintManager : MonoBehaviour
 
     public void TestHints()
     {
+        while (hints.Count > 0)
+            hints.RemoveAt(0);
         float time = Time.realtimeSinceStartup;
         FindHints(true);
         Debug.Log("Total time to search all hints: " + (Time.realtimeSinceStartup - time) + " hints found: " + hints.Count);
@@ -166,6 +164,7 @@ public class HintManager : MonoBehaviour
             {
                 if (Grid.ptr.tiles[i, j] == null)
                     continue;
+
                 if(hints.Count < 3 || all)
                     GenerateWord(Grid.ptr.tiles[i, j], t, all);
                 while (t.Count > 0)
@@ -200,9 +199,14 @@ public class HintManager : MonoBehaviour
             stringBuilder.Append(t[i].letter.letter);
             //word += t[i].letter.letter;
         }
+        if (stringBuilder.Length == 2)
+        {
+            if (debugUseBuckets && !GameDictionary.dictionary.SetBucket(stringBuilder.ToString()))
+                return;
+        }
         //If the string length is greater than the min word count then check if it is a word
         //If it's a word then add the tiles containing the letters to make up the discovered word
-        if (stringBuilder.Length >= 3 && GameDictionary.dictionary.isWord(stringBuilder.ToString()))
+        if (stringBuilder.Length >= 3 && (debugUseBuckets ? GameDictionary.dictionary.isWordBucket(stringBuilder.ToString()) : GameDictionary.dictionary.isWord(stringBuilder.ToString())))
         {
             hints.Add(new Tile[t.Count]);
             for (int i = 0; i < t.Count; ++i)
@@ -212,7 +216,7 @@ public class HintManager : MonoBehaviour
         }
         if (t.Count >= Grid.ptr.solveAmount)
             return;
-        //string check = "";
+
         //Get the adjacent tiles that we don't already have and recursively go through this with the adjacent tiles
         int index = t.Count;
         List<Tile> adj = current.GetAdjacentTiles();
@@ -221,17 +225,8 @@ public class HintManager : MonoBehaviour
             if (t.Contains(adj[i]))
                 continue;
             GenerateWord(adj[i], t, all);
-            for (int j = 0; j < t.Count; ++j)
-            {
-                //check += t[j].letter.letter;
-                stringBuilder.Append(t[j].letter.letter);
-            }
-            if (!GameDictionary.dictionary.isWord(stringBuilder.ToString()))
-            {
-                while (t.Count > index)
-                    t.RemoveAt(t.Count - 1);
-            }
-            //check = "";
+            while (t.Count > index)
+                t.RemoveAt(t.Count - 1);
         }
     }
 }

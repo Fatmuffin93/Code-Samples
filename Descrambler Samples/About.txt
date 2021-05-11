@@ -2,5 +2,7 @@ Descrambler is a mobile word puzzle game. If the player is taking too long to fi
 will be generated for them.
 The Hint script iterates through every tile on the board and recursively checks adjacent tiles
 to construct a word. That word is then cross-referenced in the game's dictionary which is a
-dictionary<int, List<string>>, the key being the string hash and the list being the words that
-share that hash.
+Dictionary<<string>, Dictionary<int, List<string>>> 
+ - The first key being the first two letters the board picks up
+	- This will eliminate cases such as 'bk' since no words start with those two letters
+ - The second key is the string hash and the list being the words that share that hash

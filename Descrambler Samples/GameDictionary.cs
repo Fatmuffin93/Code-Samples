@@ -11,7 +11,10 @@ public class GameDictionary : MonoBehaviour
     public static GameDictionary dictionary;
     TextAsset textFile;
     Dictionary<int, List<string>> d;
+    Dictionary<int, List<string>> currentBucket;
+    Dictionary<string, Dictionary<int, List<string>>> e;
     bool loaded = false;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -33,6 +36,7 @@ public class GameDictionary : MonoBehaviour
             yield break;
         loaded = false;
         d = new Dictionary<int, List<string>>();
+        e = new Dictionary<string, Dictionary<int, List<string>>>();
         textFile = (TextAsset)Resources.Load("words");
         string[] array = textFile.text.Split('\n');
         string s;
@@ -44,7 +48,24 @@ public class GameDictionary : MonoBehaviour
             hash = s.GetHashCode();
             if (s.ToCharArray().Length >= 3 && s.ToCharArray().Length <= 9)
             {
-                if (d.ContainsKey(hash)/*d.ContainsKey(s.Substring(0, 2))*/)
+                if (e.ContainsKey(s.Substring(0, 2)))
+                {
+                    if (e[s.Substring(0, 2)].ContainsKey(hash))
+                    {
+                        e[s.Substring(0, 2)][hash].Add(s);
+                    }
+                    else
+                    {
+                        e[s.Substring(0, 2)].Add(hash, new List<string>() { s });
+                    }
+                }
+                else
+                {
+                    e.Add(s.Substring(0, 2), new Dictionary<int, List<string>>());
+                    e[s.Substring(0, 2)].Add(hash, new List<string>() { s });
+                }
+
+                if (d.ContainsKey(hash))
                 {
                     d[hash].Add(s);
                 }
@@ -59,7 +80,6 @@ public class GameDictionary : MonoBehaviour
                 count = 0;
                 yield return null;
             }
-            //Debug.Log(line);
         }
 
         textFile = null;
@@ -73,12 +93,34 @@ public class GameDictionary : MonoBehaviour
 
     public bool isWord(string word)
     {
-        //Debug.Log(word + " in dictionary: " + dictionary.ContainsKey(word));
         if (word.Length < 3)
             return false;
         int hash = word.GetHashCode();
         if (d.ContainsKey(hash))
             return d[hash].Contains(word);
+        return false;
+    }
+
+    public bool SetBucket(string key)
+    {
+        if (e.ContainsKey(key))
+        {
+            currentBucket = e[key];
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool isWordBucket(string word)
+    {
+        if (word.Length < 3)
+            return false;
+        int hash = word.GetHashCode();
+        if (currentBucket.ContainsKey(hash))
+            return currentBucket[hash].Contains(word);
         return false;
     }
 }
